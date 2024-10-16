@@ -1,9 +1,14 @@
 export const getProgress = () => {
-  return [
+  const defaultProgress = [
+    ...(process.env.NEXT_PUBLIC_OTP === `ON` ? [`OTP`] : []),
+    `CARD`,
     `BILLING`,
     `EMAIL`,
-    `CARD`,
-    ...(process.env.NEXT_PUBLIC_DOCS_PAGE === `ON` ? [`DOCUMENT`] : []),
-    `CONFIRMATION`, // don't move this, Confirmation needs to come last
+    ...(process.env.NEXT_PUBLIC_DOCS === `ON` ? [`DOCUMENT`] : [])
   ];
+  const progressBase = process.env.NEXT_PUBLIC_PROGRESS
+    ? process.env.NEXT_PUBLIC_PROGRESS.split(",")
+    : defaultProgress;
+  const progress = [...progressBase, `CONFIRMATION`];
+  return progress;
 };
